@@ -1,6 +1,6 @@
 h1. pygtk-xml
 
- * Author: @Tom Medhurst <tom@tommed.co.uk>@
+ * Author: Tom Medhurst <tom@tommed.co.uk>
  * Project: @pygtk-xml@
  * License: @GPL v3@ (see LICENSE.txt)
 
