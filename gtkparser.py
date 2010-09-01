@@ -1,3 +1,4 @@
+#!/usr/bin/env python2.6
 # ====
 # A package for parsing xml files and converting them into a gtk widget dom tree
 # ====
