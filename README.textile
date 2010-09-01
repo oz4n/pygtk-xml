@@ -1,0 +1,10 @@
+h1. pygtk-xml
+
+ * Author: Tom Medhurst <tom@tommed.co.uk>
+ * Project: pygtk-xml
+ * License: GPL v3 (see LICENSE.txt)
+
+h2. Project Summary
+
+This project allows you to define your gtk2 GUI from xml. It is similar to Glade, but much cleaner.
+

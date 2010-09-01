@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<VBox expand="true" fill="true" padding="0" homogeneous="true" spacing="3">
+	<HBox expand="true" fill="true" padding="0">
+		<Button text="btn1" expand="true"/>
+		<Button text="btn2" expand="true"/>
+		<Button text="btn3" expand="true"/>
+	</HBox>
+	<HBox expand="true" fill="true" homeogeneous="false">
+		<Button text="btn4" fill="true" expand="true"/>
+		<Button text="btn5" fill="true" expand="true"/>
+		<Button text="btn6" fill="true" expand="true"/>
+	</HBox>
+	<HBox>
+		<Button text="btn7" fill="true" expand="true"/>
+		<Button text="btn8" fill="true" expand="true"/>
+		<Button text="btn9" fill="true" expand="true"/>
+	</HBox>
+</VBox>
