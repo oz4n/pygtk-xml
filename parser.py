@@ -1,3 +1,13 @@
+# ====
+# A package for parsing xml files and converting them into a gtk widget dom tree
+# ====
+# Example:
+#		win = gtk.Window()
+#   ...
+# 	Parser(win, xmlpath).parse()
+#   win.show()
+#   gtk.main()
+#
 import sys
 from xml.etree.ElementTree import parse as xmlparse
 import pygtk
@@ -15,7 +25,7 @@ DEF_PADDING = 0
 
 ## // Attributes //
 
-def timedef(func):
+def timerdef(func):
 	""" an attribute to time a method """
 	def wrapper(*arg):
 		start = time.time()
@@ -76,7 +86,7 @@ class Parser:
 		self.path = path
 		self.debug = debug
 
-	@timedef
+	@timerdef
 	def parse(self):
 		""" parse the xml in self.path and return the gtk translation """
 		dom = xmlparse(self.path)
@@ -116,7 +126,7 @@ class Parser:
 					@fill - if the widget should be added with fill
 					@padding - if the widget should be added with padding
 				"""
-		# lambda
+		# supported widgets
 		tag = xmlelem.tag
 		if tag == "VBox":
 			return self.convert_vbox(xmlelem)
@@ -127,45 +137,51 @@ class Parser:
 		else:
 			raise UnknownWidgetError(xmlelem)
 
+	def get_efp(self, node):
+		""" get expand, fill, and padding """
+		expand = node.attrib['expand']=='true' if 'expand' in node.attrib else DEF_EXPAND
+		fill = node.attrib['fill']=='true' if 'fill' in node.attrib else DEF_FILL
+		padding = node.attrib['padding']=='true' if 'padding' in node.attrib else DEF_PADDING
+		return expand, fill, padding
+
 	def convert_vbox(self, node):
 		homogeneous = node.attrib['homogeneous'] == 'true' if 'homogeneous' in node.attrib else DEF_HOMEOGENEOUS 
 		spacing = int(node.attrib['spacing']) if 'spacing' in node.attrib else DEF_SPACING
-		expand = node.attrib['expand']=='true' if 'expand' in node.attrib else DEF_EXPAND
-		fill = node.attrib['fill']=='true' if 'expand' in node.attrib else DEF_FILL
-		padding = node.attrib['padding']=='true' if 'padding' in node.attrib else DEF_PADDING
+		e, f, p = self.get_efp(node)
 		widget = gtk.VBox(homogeneous, spacing)
 		if self.debug:
-			print "vbox: homogeneous=%s, spacing=%d, expand=%s, fill=%s, padding=%d" % (homogeneous, spacing, expand, fill, padding)
-		return widget, expand, fill, padding, True
+			print "vbox: homogeneous=%s, spacing=%d, expand=%s, fill=%s, padding=%d" % (homogeneous, spacing, e, f, p)
+		return widget, e, f, p, True
 
 	def convert_hbox(self, node):
 		homogeneous = node.attrib['homogeneous'] == 'true' if 'homogeneous' in node.attrib else DEF_HOMEOGENEOUS 
 		spacing = int(node.attrib['spacing']) if 'spacing' in node.attrib else DEF_SPACING
-		expand = node.attrib['expand']=='true' if 'expand' in node.attrib else DEF_EXPAND
-		fill = node.attrib['fill']=='true' if 'expand' in node.attrib else DEF_FILL
-		padding = node.attrib['padding']=='true' if 'padding' in node.attrib else DEF_PADDING
+		e, f, p = self.get_efp(node)
 		widget = gtk.HBox(homogeneous, spacing)
 		if self.debug:
-			print "hbox: homogeneous=%s, spacing=%d, expand=%s, fill=%s, padding=%d" % (homogeneous, spacing, expand, fill, padding)
-		return widget, expand, fill, padding, True
+			print "hbox: homogeneous=%s, spacing=%d, expand=%s, fill=%s, padding=%d" % (homogeneous, spacing, e, f, p)
+		return widget, e, f, p, True
 
 	def convert_button(self, node):
-		expand = node.attrib['expand']=='true' if 'expand' in node.attrib else DEF_EXPAND
-		fill = node.attrib['fill']=='true' if 'fill' in node.attrib else DEF_FILL
-		padding = node.attrib['padding']=='true' if 'padding' in node.attrib else DEF_PADDING
 		label = node.attrib['text'] if 'text' in node.attrib else ''
 		stock = node.attrib['stock'] if 'stock' in node.attrib else None
+		e, f, p = self.get_efp(node)
 		widget = gtk.Button(label, stock)
 		if self.debug:
-			print "button: label=%s, stock=%s, expand=%s, fill=%s, padding=%d" % (label, stock, expand, fill, padding)
-		return widget, expand, fill, padding, False
+			print "button: label=%s, stock=%s, expand=%s, fill=%s, padding=%d" % (label, stock, e, f, p)
+		return widget, e, f, p, False
 
 
 ## // Command Entry Point //
 
+def harness_quit(widget, data=None):
+	print "test quitting"
+	gtk.main_quit()
+
 if __name__ == "__main__":
 	win = gtk.Window()
 	win.set_title('Test Harness Window')
+	win.connect("destroy", harness_quit)
 	win.resize(600, 350)
 	Parser(win, sys.argv[1], debug=True).parse()
 	win.show()
