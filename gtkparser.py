@@ -5,7 +5,7 @@
 # Example:
 #		win = gtk.Window()
 #   ...
-# 	Parser(win, xmlpath).parse()
+# 	Parser(win, 'res/layouts/main.xml').parse()
 #   win.show()
 #   gtk.main()
 #
@@ -82,6 +82,7 @@ class Parser:
 		""" Parser(gtkwin, path) 
 				@gtkwin - The gtk.Window which will contain the widgets parsed from the xml file at @path
 				@path - The file path of the xml file containing the widget definition 
+				@debug - Write debug info to stdout if True
 				"""
 		self.gtkwin = gtkwin
 		self.path = path
@@ -145,11 +146,31 @@ class Parser:
 		padding = node.attrib['padding']=='true' if 'padding' in node.attrib else DEF_PADDING
 		return expand, fill, padding
 
+	def set_widget_props(self, node, gtkwidget):
+		""" set_widget_props(node, gtkwidget)
+				@node - xml node containing the element
+				@gtkwidget - the gtk widget
+				grab widget properties and set them on the widget 
+				"""
+		if 'size' in node.attrib:
+				size = node.attrib['size'].split('x')
+				gtkwidget.set_size_request(int(size[0]), (int(size[1]) if len(size) > 1 else -1))
+				print "set size-request = %s" % repr(size)
+		if 'background' in node.attrib:
+				background = node.attrib['background']
+				gtkwidget.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(background))
+				print "set bg = %s" % repr(background)
+		if 'foreground' in node.attrib:
+				foreground = node.attrib['foreground']
+				gtkwidget.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse(foreground))
+				print "set fg = %s" % repr(foreground)
+
 	def convert_vbox(self, node):
 		homogeneous = node.attrib['homogeneous'] == 'true' if 'homogeneous' in node.attrib else DEF_HOMEOGENEOUS 
 		spacing = int(node.attrib['spacing']) if 'spacing' in node.attrib else DEF_SPACING
 		e, f, p = self.get_efp(node)
 		widget = gtk.VBox(homogeneous, spacing)
+		self.set_widget_props(node, widget)
 		if self.debug:
 			print "vbox: homogeneous=%s, spacing=%d, expand=%s, fill=%s, padding=%d" % (homogeneous, spacing, e, f, p)
 		return widget, e, f, p, True
@@ -159,6 +180,7 @@ class Parser:
 		spacing = int(node.attrib['spacing']) if 'spacing' in node.attrib else DEF_SPACING
 		e, f, p = self.get_efp(node)
 		widget = gtk.HBox(homogeneous, spacing)
+		self.set_widget_props(node, widget)
 		if self.debug:
 			print "hbox: homogeneous=%s, spacing=%d, expand=%s, fill=%s, padding=%d" % (homogeneous, spacing, e, f, p)
 		return widget, e, f, p, True
@@ -168,6 +190,7 @@ class Parser:
 		stock = node.attrib['stock'] if 'stock' in node.attrib else None
 		e, f, p = self.get_efp(node)
 		widget = gtk.Button(label, stock)
+		self.set_widget_props(node, widget)
 		if self.debug:
 			print "button: label=%s, stock=%s, expand=%s, fill=%s, padding=%d" % (label, stock, e, f, p)
 		return widget, e, f, p, False
